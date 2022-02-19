@@ -9,3 +9,14 @@ role_salary DECIMAL(12,2),
 role_department int,
 FOREIGN KEY (role_department) REFERENCES department(id)
 );
+
+
+CREATE TABLE employees(
+id int auto_increment primary key NOT NULL,
+first_name varchar(32) NOT NULL,
+last_name varchar(32) NOT NULL,
+role_id int,
+manager_id int,
+FOREIGN KEY (role_id) REFERENCES roles(id),
+FOREIGN KEY (manager_id) REFERENCES employees(id)
+)
