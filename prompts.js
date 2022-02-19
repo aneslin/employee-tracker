@@ -1,16 +1,8 @@
+const db = require('./connection')
 
-/*
-const get_dept = function () {
-  db.promise().query('select * from department').then(rows => {
-    const inq_choice = []
-      rows[0].map(pair => {
-      inq_choice.push({'name':pair.department_name, "value":pair.id})
-    }
-    )
-    return(inq_choice) --
-  }).then(()=>db.end())}
 
-*/
+
+
 const startMenu = [
   {
     type: 'list',
@@ -65,13 +57,7 @@ const new_emp = [
     message: 'Employee last name'
   },
 
-  /* {
-    type: "list",
-    name: "emp_department",
-    message: "select employee department",
-    choices: get_dept()
-  } */
-  {
+    {
     type: 'input',
     name: 'emp_department',
     message: 'Enter Employee Department'
@@ -100,6 +86,9 @@ check = [
     message: 'Return to main menu'
   }
 ]
+
+
+
 
 module.exports = {
   startMenu: startMenu,
