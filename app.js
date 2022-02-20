@@ -1,8 +1,11 @@
 const inquirer = require("inquirer");
-const { startMenu, new_dept,  check } = require("./prompts");
+const { startMenu, new_dept, check } = require("./prompts");
 const cTable = require("console.table");
 const db = require("./connection");
 const Employee = require("./Employee");
+
+
+
 const mainMenu = () => {
   inquirer.prompt(startMenu).then((choice) => {
     switch (choice.startSelection) {
@@ -65,7 +68,9 @@ const add_dept = function () {
 
 const view_roles = function () {
   db.promise()
-    .query("SELECT role_name, role_salary, d.department_name FROM roles inner join department d on role_department = d.id ")
+    .query(
+      "SELECT role_name, role_salary, d.department_name FROM roles inner join department d on role_department = d.id "
+    )
     .then(([rows, fields]) => {
       console.table(rows);
 
@@ -97,7 +102,7 @@ const add_role_name = function () {
     .then((result) => {
       role.role_name = result.role_name;
       role.salary = result.role_salary;
-      role_dept(role)
+      role_dept(role);
     });
 };
 
@@ -116,7 +121,7 @@ const role_dept = function (role) {
         ])
         .then((res) => {
           role.department = res.r_dept;
-          console.log(role.salary)
+          console.log(role.salary);
           db.query(
             `INSERT INTO roles (role_name, role_salary, role_department) values (?,?,?)`,
             [role.role_name, role.salary, role.department],
@@ -223,8 +228,6 @@ const employee_role = function (employee) {
     });
 };
 
-
-
 const employee_dept = function (employee) {
   db.promise()
     .query(`SELECT * FROM department`)
@@ -232,9 +235,7 @@ const employee_dept = function (employee) {
       console.table(rows);
       inquirer
         .prompt([
-          { type: "input", 
-          name: "dept_id", 
-          message: "enter department id" },
+          { type: "input", name: "dept_id", message: "enter department id" },
         ])
         .then((results) => {
           employee.dept_id = results.dept_id;
@@ -243,40 +244,125 @@ const employee_dept = function (employee) {
     });
 };
 
-const emp_manager = function(employee){
-  db.promise().query(`SELECT id, CONCAT(first_name, ' ' , last_name) from employees`).then(([rows, fields]) => {
-    console.table(rows)
-    inquirer.prompt([{type:'input', name:'manager_id', message:"enter manager id or leave blank"}]).then(results => {
-      if(results.manager_id){
-        employee.manager_id = results.manager_id
-        insert_emp(employee)
-      } else 
-      insert_emp(employee)
-    }
-    )
-  }
-  )
-}
+const emp_manager = function (employee) {
+  db.promise()
+    .query(`SELECT id, CONCAT(first_name, ' ' , last_name) from employees`)
+    .then(([rows, fields]) => {
+      console.table(rows);
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "manager_id",
+            message: "enter manager id or leave blank",
+          },
+        ])
+        .then((results) => {
+          if (results.manager_id) {
+            employee.manager_id = results.manager_id;
+            insert_emp(employee);
+          } else insert_emp(employee);
+        });
+    });
+};
 
 const insert_emp = function (employee) {
-  console.log(employee)
+  console.log(employee);
   db.query(
-    `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?) `,[
+    `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?) `,
+    [
       employee.first_name,
       employee.last_name,
       employee.role_id,
-      employee.manager_id
-    ], (err, result) => {
-      if (err) { console.log(err)
-        inquirer.prompt([{type:'choice', name: 'insert_error', message: "insert failed", choices: ['Main Menu', 'New Employee']}]).then(errchoice => {
-          if (errchoice.insert_error ==='Main Menu' )  { mainMenu()} else {new_emp_name()}
-        }
-        ) 
-      } console.log(result) 
-        mainMenu()
-    } 
+      employee.manager_id,
+    ],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        inquirer
+          .prompt([
+            {
+              type: "choice",
+              name: "insert_error",
+              message: "insert failed",
+              choices: ["Main Menu", "New Employee"],
+            },
+          ])
+          .then((errchoice) => {
+            if (errchoice.insert_error === "Main Menu") {
+              mainMenu();
+            } else {
+              new_emp_name();
+            }
+          });
+      }
+      console.log(result);
+      mainMenu();
+    }
   );
 };
 
-mainMenu()
 
+const change_role_finde = function () {
+  employee = {};
+  db.promise()
+    .query(
+      `SELECT e.id, CONCAT(e.first_name, ' ', e.last_name) as Name, r.role_name from employees e inner join roles r on e.role_id = r.id `
+    )
+    .then(([rows, fields]) =>{console.table(rows)
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "employee_id",
+            message: "select the employee to update",
+          },
+        ])
+        .then((result) => {
+          employee.id = result.employee_id;
+          change_role_findr(employee)
+        })
+      });
+};
+
+const change_role_findr = function (employee) {
+  db.promise()
+    .query(`SELECT id, role_name, role_salary from roles`)
+    .then(([rows, fields])  => {console.table(rows)
+      inquirer.prompt([
+        {
+          type: "input",
+          name: "role_id",
+          message: "select the role to assign to the employee",
+        },
+      ]).then(res => {db.query(`UPDATE employees SET role_id = ? where id = ? `, [res.role_id, employee.id], (err, result) => {
+      if(err){ console.log(err)
+        inquirer
+        .prompt([
+          {
+            type: "choice",
+            name: "insert_error",
+            message: "insert failed",
+            choices: ["Main Menu", "New Employee"],
+          },
+        ])
+        .then((errchoice) => {
+          if (errchoice.insert_error === "Main Menu") {
+            mainMenu();
+          } else {
+            change_role_finde();
+          }
+        });
+      } mainMenu()
+      
+      }) })
+    });
+};
+
+
+                                                                                                    
+
+
+
+
+change_role_finde();
