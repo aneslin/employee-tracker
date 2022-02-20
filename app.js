@@ -1,5 +1,5 @@
 const inquirer = require("inquirer");
-const { startMenu, new_dept, new_role, new_emp, check } = require("./prompts");
+const { startMenu, new_dept,  check } = require("./prompts");
 const cTable = require("console.table");
 const db = require("./connection");
 const Employee = require("./Employee");
@@ -23,7 +23,7 @@ const mainMenu = () => {
         break;
 
       case "add_emp":
-        add_emp();
+        ew_emp_name();
         break;
       default:
         console.log("damn it");
@@ -65,7 +65,7 @@ const add_dept = function () {
 
 const view_roles = function () {
   db.promise()
-    .query("SELECT * FROM roles")
+    .query("SELECT role_name, role_salary, d.department_name FROM roles inner join department d on role_department = d.id ")
     .then(([rows, fields]) => {
       console.table(rows);
 
@@ -79,26 +79,73 @@ const view_roles = function () {
     });
 };
 
-const add_role = function () {
+const add_role_name = function () {
+  const role = {};
   inquirer
     .prompt([
       {
         type: "input",
         name: "role_name",
-        message: "Employee first name",
+        message: "New role name",
       },
       {
         type: "input",
         name: "role_salary",
-        message: "Employee last name",
-      },
-      {
-        type: "input",
-        name: "dept",
-        message: "department",
+        message: "What is the salary for this role?",
       },
     ])
-    .then(result`INSERT INTO roles ('')`);
+    .then((result) => {
+      role.role_name = result.role_name;
+      role.salary = result.role_salary;
+      role_dept(role)
+    });
+};
+
+const role_dept = function (role) {
+  db.promise()
+    .query(`select * from department`)
+    .then(([rows, fields]) => {
+      console.table(rows);
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "r_dept",
+            message: "What dept does this role belong to?",
+          },
+        ])
+        .then((res) => {
+          role.department = res.r_dept;
+          console.log(role.salary)
+          db.query(
+            `INSERT INTO roles (role_name, role_salary, role_department) values (?,?,?)`,
+            [role.role_name, role.salary, role.department],
+            (err, result) => {
+              if (err) {
+                console.log(err);
+                inquirer
+                  .prompt([
+                    {
+                      type: "choice",
+                      name: "insert_error",
+                      message: "insert failed",
+                      choices: ["Main Menu", "New Role"],
+                    },
+                  ])
+                  .then((errchoice) => {
+                    if (errchoice.insert_error === "Main Menu") {
+                      mainMenu();
+                    } else {
+                      add_role_name();
+                    }
+                  });
+              }
+              console.log(result);
+              mainMenu();
+            }
+          );
+        });
+    });
 };
 
 const view_emp = function () {
@@ -176,7 +223,7 @@ const employee_role = function (employee) {
     });
 };
 
-new_emp_name();
+
 
 const employee_dept = function (employee) {
   db.promise()
@@ -231,18 +278,5 @@ const insert_emp = function (employee) {
   );
 };
 
+mainMenu()
 
-const getManagers = () => {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT CONCAT(b.first_name, " ", b.last_name) AS Name 
-        FROM employee a LEFT JOIN employee b
-        ON a.manager_id = b.id
-        WHERE a.manager_id IS NOT NULL;`,
-      (err, res) => {
-        if (err) reject(err);
-        resolve(res);
-      }
-    );
-  });
-};
