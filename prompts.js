@@ -1,8 +1,20 @@
+const inquirer = require('inquirer');
 const db = require('./connection')
 
 
-
-
+ /* const get_dept = function () {
+   db.promise()
+     .query("select * from department")
+     .then((rows) => {
+       inq_choice = rows[0].map((pair) => {
+         const x = { name: pair.department_name, value: pair.id };
+         return x;
+       });
+       console.log(inq_choice);
+       return inq_choice;
+     });
+ }; 
+get_dept() */
 const startMenu = [
   {
     type: 'list',
@@ -29,6 +41,13 @@ const new_dept = [
 ]
 
 const new_role = [
+
+     {
+    type: "list",
+    name: "emp_department",
+    message: "select employee department",
+    }
+  , 
   {
     type: 'input',
     name: 'name',
@@ -57,7 +76,8 @@ const new_emp = [
     message: 'Employee last name'
   },
 
-    {
+ 
+  {
     type: 'input',
     name: 'emp_department',
     message: 'Enter Employee Department'
@@ -86,6 +106,14 @@ check = [
     message: 'Return to main menu'
   }
 ]
+
+
+/* db.promise().query("select department_name FROM department", (err, results, fields) => {
+  results.map((pair) => {
+     pair.department_name;
+  });
+}).then(thing => console.log(thing));
+ */
 
 
 
