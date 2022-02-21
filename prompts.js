@@ -27,7 +27,8 @@ const startMenu = [
       { name: 'Add a department', value: 'add_dept' },
       { name: 'Add a role', value: 'add_role' },
       { name: 'Add an employee', value: 'add_emp' },
-      { name: 'Update an employee role', value: 'update_emp_role' }
+      { name: 'Update an employee role', value: 'update_emp_role' },
+      {name: "View total utilized budget", value:'all_budg'}
     ]
   }
 ]

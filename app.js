@@ -25,9 +25,15 @@ const mainMenu = () => {
         add_dept();
         break;
 
+      case 'add_role':
+        add_role_name()
+        break;
       case "add_emp":
         ew_emp_name();
         break;
+
+      case 'update_emp_role':
+        change_role_finde()
       default:
         console.log("damn it");
     }
@@ -362,7 +368,3 @@ const change_role_findr = function (employee) {
 
                                                                                                     
 
-
-
-
-change_role_finde();
