@@ -29,7 +29,7 @@ const mainMenu = () => {
         add_role_name()
         break;
       case "add_emp":
-        ew_emp_name();
+        new_emp_name();
         break;
 
       case 'update_emp_role':
