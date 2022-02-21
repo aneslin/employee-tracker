@@ -28,7 +28,8 @@ const startMenu = [
       { name: 'Add a role', value: 'add_role' },
       { name: 'Add an employee', value: 'add_emp' },
       { name: 'Update an employee role', value: 'update_emp_role' },
-      {name: "View total utilized budget", value:'all_budg'}
+      {name: "View total utilized budget", value:'all_budg'},
+      {name: "exit", value:'exit'},
     ]
   }
 ]

@@ -34,6 +34,15 @@ const mainMenu = () => {
 
       case 'update_emp_role':
         change_role_finde()
+        break;
+
+      case 'all_budg':
+        all_budg()
+        break;
+
+      case 'exit':
+        process.exit()
+        break
       default:
         console.log("damn it");
     }
@@ -366,5 +375,21 @@ const change_role_findr = function (employee) {
 };
 
 
-                                                                                                    
+const all_budg = function(){
+  db.promise().query(`select  SUM(r.role_salary), d.department_name from  employees e
+  inner join 
+  roles r
+  on e.role_id = r.id
+  inner join
+  department d 
+  on r.role_department = d.id
+  group by (d.department_name)`).then(([rows,fields])=> {
+    console.table(rows)
+    inquirer.prompt(check).then(value => {if(value){mainMenu()}})
+  })
+}
+
+
+
+mainMenu()                                                                                                
 
